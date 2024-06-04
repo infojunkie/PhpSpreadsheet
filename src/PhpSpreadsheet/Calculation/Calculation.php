@@ -5489,7 +5489,7 @@ class Calculation
     /**
      * Get a list of all implemented functions as an array of function objects.
      */
-    public static function getFunctions(): array
+    public static function &getFunctions(): array
     {
         return self::$phpSpreadsheetFunctions;
     }
