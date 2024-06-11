@@ -3855,7 +3855,7 @@ class Calculation
      *
      * @param mixed $value First matrix operand
      */
-    private function showValue(mixed $value): mixed
+    public function showValue(mixed $value): mixed
     {
         if ($this->debugLog->getWriteDebugLog()) {
             $testArray = Functions::flattenArray($value);
