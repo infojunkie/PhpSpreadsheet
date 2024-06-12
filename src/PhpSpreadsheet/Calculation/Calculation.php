@@ -4776,41 +4776,18 @@ class Calculation
 
                         break;
                     case '&':            //    Concatenation
-                        //    If either of the operands is a matrix, we need to treat them both as matrices
-                        //        (converting the other operand to a matrix if need be); then perform the required
-                        //        matrix operation
+                        $operand1 = Functions::flattenSingleValue($operand1);
+                        $operand2 = Functions::flattenSingleValue($operand2);
                         $operand1 = self::boolToString($operand1);
                         $operand2 = self::boolToString($operand2);
-                        if (is_array($operand1) || is_array($operand2)) {
-                            if (is_string($operand1)) {
-                                $operand1 = self::unwrapResult($operand1);
-                            }
-                            if (is_string($operand2)) {
-                                $operand2 = self::unwrapResult($operand2);
-                            }
-                            //    Ensure that both operands are arrays/matrices
-                            [$rows, $columns] = self::checkMatrixOperands($operand1, $operand2, 2);
 
-                            for ($row = 0; $row < $rows; ++$row) {
-                                for ($column = 0; $column < $columns; ++$column) {
-                                    $operand1[$row][$column]
-                                        = Shared\StringHelper::substring(
-                                            self::boolToString($operand1[$row][$column])
-                                            . self::boolToString($operand2[$row][$column]),
-                                            0,
-                                            DataType::MAX_STRING_LENGTH
-                                        );
-                                }
-                            }
-                            $result = $operand1;
-                        } else {
-                            // In theory, we should truncate here.
-                            // But I can't figure out a formula
-                            // using the concatenation operator
-                            // with literals that fits in 32K,
-                            // so I don't think we can overflow here.
-                            $result = self::FORMULA_STRING_QUOTE . str_replace('""', self::FORMULA_STRING_QUOTE, self::unwrapResult($operand1) . self::unwrapResult($operand2)) . self::FORMULA_STRING_QUOTE;
-                        }
+                        // In theory, we should truncate here.
+                        // But I can't figure out a formula
+                        // using the concatenation operator
+                        // with literals that fits in 32K,
+                        // so I don't think we can overflow here.
+                        $result = self::FORMULA_STRING_QUOTE . str_replace('""', self::FORMULA_STRING_QUOTE, self::unwrapResult($operand1) . self::unwrapResult($operand2)) . self::FORMULA_STRING_QUOTE;
+
                         $this->debugLog->writeDebugLog('Evaluation Result is %s', $this->showTypeDetails($result));
                         $stack->push('Value', $result);
 
