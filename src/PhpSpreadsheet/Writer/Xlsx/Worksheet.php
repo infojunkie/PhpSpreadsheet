@@ -5,6 +5,7 @@ namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx\Namespaces;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 use PhpOffice\PhpSpreadsheet\Settings;
@@ -30,6 +31,8 @@ class Worksheet extends WriterPart
 
     private bool $explicitStyle0;
 
+    private bool $useDynamicArrays = false;
+
     /**
      * Write worksheet to XML format.
      *
@@ -40,6 +43,7 @@ class Worksheet extends WriterPart
      */
     public function writeWorksheet(PhpspreadsheetWorksheet $worksheet, array $stringTable = [], bool $includeCharts = false): string
     {
+        $this->useDynamicArrays = $this->getParentWriter()->useDynamicArrays();
         $this->explicitStyle0 = $this->getParentWriter()->getExplicitStyle0();
         $this->numberStoredAsText = '';
         $this->formula = '';
@@ -1558,6 +1562,15 @@ class Worksheet extends WriterPart
         }
         $objWriter->startElement('c');
         $objWriter->writeAttribute('r', $cellAddress);
+        $mappedType = $pCell->getDataType();
+        if ($mappedType === DataType::TYPE_FORMULA) {
+            if ($this->useDynamicArrays) {
+                $tempCalc = $pCell->getCalculatedValue();
+                if (is_array($tempCalc)) {
+                    $objWriter->writeAttribute('cm', '1');
+                }
+            }
+        }
 
         // Sheet styles
         if ($xfi) {
@@ -1568,9 +1581,6 @@ class Worksheet extends WriterPart
 
         // If cell value is supplied, write cell value
         if ($writeValue) {
-            // Map type
-            $mappedType = $pCell->getDataType();
-
             // Write data depending on its type
             switch (strtolower($mappedType)) {
                 case 'inlinestr':    // Inline string
