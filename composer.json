@@ -74,6 +74,7 @@
         "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-simplexml": "*",
+        "ext-sqlite3": "*",
         "ext-xml": "*",
         "ext-xmlreader": "*",
         "ext-xmlwriter": "*",

@@ -936,6 +936,12 @@ class Calculation
             'functionCall' => [Database\DSum::class, 'evaluate'],
             'argumentCount' => '3',
         ],
+        'DUMMYFUNCTION' => [
+            'category' => Category::CATEGORY_LOOKUP_AND_REFERENCE,
+            'functionCall' => [Google\Google::class, 'dummyfunction'],
+            'argumentCount' => '1',
+            'passCellReference' => true,
+        ],
         'DURATION' => [
             'category' => Category::CATEGORY_FINANCIAL,
             'functionCall' => [Functions::class, 'DUMMY'],
@@ -2115,6 +2121,11 @@ class Calculation
             'category' => Category::CATEGORY_STATISTICAL,
             'functionCall' => [Statistical\Percentiles::class, 'QUARTILE'],
             'argumentCount' => '2',
+        ],
+        'QUERY' => [
+            'category' => Category::CATEGORY_DATABASE,
+            'functionCall' => [Google\Google::class, 'query'],
+            'argumentCount' => '2,3',
         ],
         'QUOTIENT' => [
             'category' => Category::CATEGORY_MATH_AND_TRIG,
