@@ -545,12 +545,12 @@ class Calculation
             'argumentCount' => '2+',
         ],
         'CHOOSECOLS' => [
-            'category' => Category::CATEGORY_MATH_AND_TRIG,
-            'functionCall' => [Functions::class, 'DUMMY'],
+            'category' => Category::CATEGORY_LOOKUP_AND_REFERENCE,
+            'functionCall' => [LookupRef\Selection::class, 'CHOOSECOLS'],
             'argumentCount' => '2+',
         ],
         'CHOOSEROWS' => [
-            'category' => Category::CATEGORY_MATH_AND_TRIG,
+            'category' => Category::CATEGORY_LOOKUP_AND_REFERENCE,
             'functionCall' => [Functions::class, 'DUMMY'],
             'argumentCount' => '2+',
         ],
