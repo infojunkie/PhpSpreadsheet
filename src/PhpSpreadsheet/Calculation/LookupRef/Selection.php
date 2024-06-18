@@ -5,8 +5,6 @@ namespace PhpOffice\PhpSpreadsheet\Calculation\LookupRef;
 use PhpOffice\PhpSpreadsheet\Calculation\ArrayEnabled;
 use PhpOffice\PhpSpreadsheet\Calculation\Functions;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
-use PhpOffice\PhpSpreadsheet\Calculation\LookupRef\RowColumnInformation;
-use PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Matrix;
 
 class Selection
 {
@@ -51,32 +49,33 @@ class Selection
         return $chooseArgs[$chosenEntry];
     }
 
-  /**
-   * CHOOSECOLS.
-   *
-   * Returns the specified columns from an array.
-   *
-   * @param mixed $cells The cells being searched
-   * @param int $cols List of numeric column indexes to extract
-   *
-   * @see https://support.microsoft.com/en-us/office/choosecols-function-bf117976-2722-4466-9b9a-1c01ed9aebff
-   * @see https://support.google.com/docs/answer/13197914?hl=en
-   *
-   * @return array|string The resulting array, or a string containing an error
-   */
-  public static function choosecols(mixed $cells, int ...$cols): array|string
-  {
-    $columns = RowColumnInformation::COLUMNS($cells);
-    if (is_string($columns)) {
-      return $columns;
+    /**
+     * CHOOSECOLS.
+     *
+     * Returns the specified columns from an array.
+     *
+     * @param mixed $cells The cells being searched
+     * @param int $cols List of numeric column indexes to extract
+     *
+     * @see https://support.microsoft.com/en-us/office/choosecols-function-bf117976-2722-4466-9b9a-1c01ed9aebff
+     * @see https://support.google.com/docs/answer/13197914?hl=en
+     *
+     * @return array|string The resulting array, or a string containing an error
+     */
+    public static function choosecols(mixed $cells, int ...$cols): array|string
+    {
+        $columns = RowColumnInformation::COLUMNS($cells);
+        if (is_string($columns)) {
+            return $columns;
+        }
+        $result = [];
+        foreach ($cols as $col) {
+            if (!$col || abs($col) > $columns) {
+                return ExcelError::VALUE();
+            }
+            $result[] = array_column($cells, $col > 0 ? $col - 1 : $columns - $col);
+        }
+
+        return Matrix::transpose($result);
     }
-    $result = [];
-    foreach ($cols as $col) {
-      if (!$col || abs($col) > $columns) {
-        return ExcelError::VALUE();
-      }
-      $result[] = array_column($cells, $col > 0 ? $col-1 : $columns-$col);
-    }
-    return Matrix::transpose($result);
-  }
 }
