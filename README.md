@@ -15,7 +15,6 @@ allow you to read and write various spreadsheet file formats such as Excel and L
 This is a fork of PhpSpreadsheet with the following additions / modifications:
 
 - Allow custom functions in `Calculation::getFunctions()` by returning a reference to the functions list.
-- Modify the concatenation operator `&` to NOT work on matrices - only on scalar values that are cast to strings. This is consistent with Excel.
 - Implement function `CHOOSECOLS`
 - Implement Google Sheets functions `__xludf.DUMMYFUNCTION` and `QUERY`
 - Make helper function `Calculation::showValue()` public

@@ -3,6 +3,7 @@
 namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
+use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -45,6 +46,7 @@ class Worksheet extends WriterPart
     {
         $this->useDynamicArrays = $this->getParentWriter()->useDynamicArrays();
         $this->explicitStyle0 = $this->getParentWriter()->getExplicitStyle0();
+        $worksheet->calculateArrays($this->getParentWriter()->getPreCalculateFormulas());
         $this->numberStoredAsText = '';
         $this->formula = '';
         $this->twoDigitTextYear = '';
@@ -1451,25 +1453,49 @@ class Worksheet extends WriterPart
 
     private function writeCellFormula(XMLWriter $objWriter, string $cellValue, Cell $cell): void
     {
+        $attributes = $cell->getFormulaAttributes() ?? [];
+        $coordinate = $cell->getCoordinate();
         $calculatedValue = $this->getParentWriter()->getPreCalculateFormulas() ? $cell->getCalculatedValue() : $cellValue;
+        if ($calculatedValue === ExcelError::SPILL()) {
+            $objWriter->writeAttribute('t', 'e');
+            //$objWriter->writeAttribute('cm', '1'); // already added
+            $objWriter->writeAttribute('vm', '1');
+            $objWriter->startElement('f');
+            $objWriter->writeAttribute('t', 'array');
+            $objWriter->writeAttribute('aca', '1');
+            $objWriter->writeAttribute('ref', $coordinate);
+            $objWriter->writeAttribute('ca', '1');
+            $objWriter->text(FunctionPrefix::addFunctionPrefixStripEquals($cellValue));
+            $objWriter->endElement(); // f
+            $objWriter->writeElement('v', ExcelError::VALUE()); // note #VALUE! in xml even though error is #SPILL!
+
+            return;
+        }
         $calculatedValueString = $this->getParentWriter()->getPreCalculateFormulas() ? $cell->getCalculatedValueString() : $cellValue;
-        if (is_string($calculatedValue)) {
-            if (ErrorValue::isError($calculatedValue)) {
-                $this->writeCellError($objWriter, 'e', $cellValue, $calculatedValue);
+        $result = $calculatedValue;
+        while (is_array($result)) {
+            $result = array_shift($result);
+        }
+        if (is_string($result)) {
+            if (ErrorValue::isError($result)) {
+                $this->writeCellError($objWriter, 'e', $cellValue, $result);
 
                 return;
             }
             $objWriter->writeAttribute('t', 'str');
-            $calculatedValue = StringHelper::controlCharacterPHP2OOXML($calculatedValue);
-            $calculatedValueString = $calculatedValue;
-        } elseif (is_bool($calculatedValue)) {
+            $result = $calculatedValueString = StringHelper::controlCharacterPHP2OOXML($result);
+            if (is_string($calculatedValue)) {
+                $calculatedValue = $calculatedValueString;
+            }
+        } elseif (is_bool($result)) {
             $objWriter->writeAttribute('t', 'b');
-            $calculatedValue = (int) $calculatedValue;
-            $calculatedValueString = (string) $calculatedValue;
+            if (is_bool($calculatedValue)) {
+                $calculatedValue = $result;
+            }
+            $result = (int) $result;
+            $calculatedValueString = (string) $result;
         }
 
-        $attributes = $cell->getFormulaAttributes() ?? [];
-        $coordinate = $cell->getCoordinate();
         if (isset($attributes['ref'])) {
             $ref = $this->parseRef($coordinate, $attributes['ref']);
         } else {
@@ -1477,16 +1503,6 @@ class Worksheet extends WriterPart
         }
         if (is_array($calculatedValue)) {
             $attributes['t'] = 'array';
-            $rows = max(1, count($calculatedValue));
-            $cols = 1;
-            foreach ($calculatedValue as $row) {
-                $cols = max($cols, is_array($row) ? count($row) : 1);
-            }
-            $firstCellArray = Coordinate::indexesFromString($coordinate);
-            $lastRow = $firstCellArray[1] + $rows - 1;
-            $lastColumn = $firstCellArray[0] + $cols - 1;
-            $lastColumnString = Coordinate::stringFromColumnIndex($lastColumn);
-            $ref = "$coordinate:$lastColumnString$lastRow";
         }
         if (($attributes['t'] ?? null) === 'array') {
             $objWriter->startElement('f');
@@ -1496,10 +1512,6 @@ class Worksheet extends WriterPart
             $objWriter->writeAttribute('ca', '1');
             $objWriter->text(FunctionPrefix::addFunctionPrefixStripEquals($cellValue));
             $objWriter->endElement();
-            $result = $calculatedValue;
-            while (is_array($result)) {
-                $result = array_shift($result);
-            }
             if (
                 is_scalar($result)
                 && $this->getParentWriter()->getOffice2003Compatibility() === false
@@ -1611,7 +1623,7 @@ class Worksheet extends WriterPart
             }
         }
 
-        $objWriter->endElement();
+        $objWriter->endElement(); // c
     }
 
     /**
