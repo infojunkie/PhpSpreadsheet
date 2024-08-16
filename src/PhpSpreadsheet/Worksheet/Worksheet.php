@@ -683,6 +683,8 @@ class Worksheet implements IComparable
      */
     public function calculateColumnWidths(): static
     {
+        $activeSheet = $this->getParent()?->getActiveSheetIndex();
+        $selectedCells = $this->selectedCells;
         // initialize $autoSizes array
         $autoSizes = [];
         foreach ($this->getColumnDimensions() as $colDimension) {
@@ -780,6 +782,10 @@ class Worksheet implements IComparable
             }
             $this->activePane = $holdActivePane;
         }
+        if ($activeSheet !== null && $activeSheet >= 0) {
+            $this->getParent()?->setActiveSheetIndex($activeSheet);
+        }
+        $this->setSelectedCells($selectedCells);
 
         return $this;
     }
@@ -3724,9 +3730,13 @@ class Worksheet implements IComparable
         }
         $activeSheetIndex = $spreadsheet->getActiveSheetIndex();
         $originalSelected = $this->selectedCells;
+        $originalActive = $this->activeCell;
         $this->getStyle($coordinate)->applyFromArray($styleArray);
+        $this->activeCell = $originalActive;
         $this->selectedCells = $originalSelected;
-        $spreadsheet->setActiveSheetIndex($activeSheetIndex);
+        if ($activeSheetIndex >= 0) {
+            $spreadsheet->setActiveSheetIndex($activeSheetIndex);
+        }
 
         return true;
     }

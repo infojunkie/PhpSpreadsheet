@@ -558,6 +558,9 @@ class Spreadsheet implements JsonSerializable
             if ($this->activeSheetIndex >= $sheetIndex) {
                 ++$this->activeSheetIndex;
             }
+            if ($this->activeSheetIndex < 0) {
+                $this->activeSheetIndex = 0;
+            }
         }
 
         if ($worksheet->getParent() === null) {
@@ -1577,5 +1580,15 @@ class Spreadsheet implements JsonSerializable
     public function getExcelCalendar(): int
     {
         return $this->excelCalendar;
+    }
+
+    public function deleteLegacyDrawing(Worksheet $worksheet): void
+    {
+        unset($this->unparsedLoadedData['sheets'][$worksheet->getCodeName()]['legacyDrawing']);
+    }
+
+    public function getLegacyDrawing(Worksheet $worksheet): ?string
+    {
+        return $this->unparsedLoadedData['sheets'][$worksheet->getCodeName()]['legacyDrawing'] ?? null;
     }
 }
