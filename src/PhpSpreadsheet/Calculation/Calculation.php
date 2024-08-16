@@ -4822,64 +4822,64 @@ class Calculation
                         }
 
                         break;
-                        case '&':            //    Concatenation
-                            //    If either of the operands is a matrix, we need to treat them both as matrices
-                            //        (converting the other operand to a matrix if need be); then perform the required
-                            //        matrix operation
-                            $operand1 = self::boolToString($operand1);
-                            $operand2 = self::boolToString($operand2);
-                            if (is_array($operand1) || is_array($operand2)) {
-                                if (is_string($operand1)) {
-                                    $operand1 = self::unwrapResult($operand1);
-                                }
-                                if (is_string($operand2)) {
-                                    $operand2 = self::unwrapResult($operand2);
-                                }
-                                //    Ensure that both operands are arrays/matrices
-                                [$rows, $columns] = self::checkMatrixOperands($operand1, $operand2, 2);
+                    case '&':            //    Concatenation
+                        //    If either of the operands is a matrix, we need to treat them both as matrices
+                        //        (converting the other operand to a matrix if need be); then perform the required
+                        //        matrix operation
+                        $operand1 = self::boolToString($operand1);
+                        $operand2 = self::boolToString($operand2);
+                        if (is_array($operand1) || is_array($operand2)) {
+                            if (is_string($operand1)) {
+                                $operand1 = self::unwrapResult($operand1);
+                            }
+                            if (is_string($operand2)) {
+                                $operand2 = self::unwrapResult($operand2);
+                            }
+                            //    Ensure that both operands are arrays/matrices
+                            [$rows, $columns] = self::checkMatrixOperands($operand1, $operand2, 2);
 
-                                for ($row = 0; $row < $rows; ++$row) {
-                                    for ($column = 0; $column < $columns; ++$column) {
-                                        $op1x = self::boolToString($operand1[$row][$column]);
-                                        $op2x = self::boolToString($operand2[$row][$column]);
-                                        if (Information\ErrorValue::isError($op1x)) {
-                                            // no need to do anything
-                                        } elseif (Information\ErrorValue::isError($op2x)) {
-                                            $operand1[$row][$column] = $op2x;
-                                        } else {
-                                            $operand1[$row][$column]
-                                                = Shared\StringHelper::substring(
-                                                    $op1x . $op2x,
-                                                    0,
-                                                    DataType::MAX_STRING_LENGTH
-                                                );
-                                        }
+                            for ($row = 0; $row < $rows; ++$row) {
+                                for ($column = 0; $column < $columns; ++$column) {
+                                    $op1x = self::boolToString($operand1[$row][$column]);
+                                    $op2x = self::boolToString($operand2[$row][$column]);
+                                    if (Information\ErrorValue::isError($op1x)) {
+                                        // no need to do anything
+                                    } elseif (Information\ErrorValue::isError($op2x)) {
+                                        $operand1[$row][$column] = $op2x;
+                                    } else {
+                                        $operand1[$row][$column]
+                                            = Shared\StringHelper::substring(
+                                                $op1x . $op2x,
+                                                0,
+                                                DataType::MAX_STRING_LENGTH
+                                            );
                                     }
                                 }
+                            }
+                            $result = $operand1;
+                        } else {
+                            // In theory, we should truncate here.
+                            // But I can't figure out a formula
+                            // using the concatenation operator
+                            // with literals that fits in 32K,
+                            // so I don't think we can overflow here.
+                            if (Information\ErrorValue::isError($operand1)) {
                                 $result = $operand1;
+                            } elseif (Information\ErrorValue::isError($operand2)) {
+                                $result = $operand2;
                             } else {
-                                // In theory, we should truncate here.
-                                // But I can't figure out a formula
-                                // using the concatenation operator
-                                // with literals that fits in 32K,
-                                // so I don't think we can overflow here.
-                                if (Information\ErrorValue::isError($operand1)) {
-                                    $result = $operand1;
-                                } elseif (Information\ErrorValue::isError($operand2)) {
-                                    $result = $operand2;
-                                } else {
-                                    $result = self::FORMULA_STRING_QUOTE . str_replace('""', self::FORMULA_STRING_QUOTE, self::unwrapResult($operand1) . self::unwrapResult($operand2)) . self::FORMULA_STRING_QUOTE;
-                                }
+                                $result = self::FORMULA_STRING_QUOTE . str_replace('""', self::FORMULA_STRING_QUOTE, self::unwrapResult($operand1) . self::unwrapResult($operand2)) . self::FORMULA_STRING_QUOTE;
                             }
-                            $this->debugLog->writeDebugLog('Evaluation Result is %s', $this->showTypeDetails($result));
-                            $stack->push('Value', $result);
+                        }
+                        $this->debugLog->writeDebugLog('Evaluation Result is %s', $this->showTypeDetails($result));
+                        $stack->push('Value', $result);
 
-                            if (isset($storeKey)) {
-                                $branchStore[$storeKey] = $result;
-                            }
+                        if (isset($storeKey)) {
+                            $branchStore[$storeKey] = $result;
+                        }
 
-                            break;
-                        case '∩':            //    Intersect
+                        break;
+                    case '∩':            //    Intersect
                         $rowIntersect = array_intersect_key($operand1, $operand2);
                         $cellIntersect = $oCol = $oRow = [];
                         foreach (array_keys($rowIntersect) as $row) {
