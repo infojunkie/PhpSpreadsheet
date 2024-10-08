@@ -4171,8 +4171,10 @@ class Calculation
                             }
                         }
                     } elseif ($expectedArgumentCount != '*') {
-                        preg_match('/(\d*)([-+,])(\d*)/', $expectedArgumentCount, $argMatch);
-                        switch ($argMatch[2] ?? '') {
+                        if (1 !== preg_match('/(\d*)([-+,])(\d*)/', $expectedArgumentCount, $argMatch)) {
+                            $argMatch = ['', '', '', ''];
+                        }
+                        switch ($argMatch[2]) {
                             case '+':
                                 if ($argumentCount < $argMatch[1]) {
                                     $argumentCountError = true;
@@ -4245,7 +4247,7 @@ class Calculation
                 // do we now have a function/variable/number?
                 $expectingOperator = true;
                 $expectingOperand = false;
-                $val = $match[1];
+                $val = $match[1] ?? '';
                 $length = strlen($val);
 
                 if (preg_match('/^' . self::CALCULATION_REGEXP_FUNCTION . '$/miu', $val, $matches)) {
@@ -4301,7 +4303,7 @@ class Calculation
                                 $rangeStartCellRef = $output[count($output) - 2]['value'] ?? '';
                             }
                             preg_match('/^' . self::CALCULATION_REGEXP_CELLREF . '$/miu', $rangeStartCellRef, $rangeStartMatches);
-                            if ($rangeStartMatches[2] !== $matches[2]) {
+                            if (isset($rangeStartMatches[2]) && $rangeStartMatches[2] !== $matches[2]) {
                                 return $this->raiseFormulaError('3D Range references are not yet supported');
                             }
                         }
@@ -4391,7 +4393,7 @@ class Calculation
                                 $valx = $val;
                                 $endRowColRef = ($refSheet !== null) ? $refSheet->getHighestDataColumn($valx) : AddressRange::MAX_COLUMN; //    Max 16,384 columns for Excel2007
                                 $val = "{$rangeWS2}{$endRowColRef}{$val}";
-                            } elseif (ctype_alpha($val) && strlen($val ?? '') <= 3) {
+                            } elseif (ctype_alpha($val) && is_string($val) && strlen($val) <= 3) {
                                 //    Column range
                                 $stackItemType = 'Column Reference';
                                 $endRowColRef = ($refSheet !== null) ? $refSheet->getHighestDataRow($val) : AddressRange::MAX_ROW; //    Max 1,048,576 rows for Excel2007
@@ -4555,6 +4557,12 @@ class Calculation
 
         return $operand;
     }
+
+    private static int $matchIndex8 = 8;
+
+    private static int $matchIndex9 = 9;
+
+    private static int $matchIndex10 = 10;
 
     /**
      * @return array<int, mixed>|false
@@ -4919,12 +4927,17 @@ class Calculation
             } elseif (preg_match('/^' . self::CALCULATION_REGEXP_CELLREF . '$/i', $token ?? '', $matches)) {
                 $cellRef = null;
 
-                if (isset($matches[8])) {
+                /* Phpstan says matches[8/9/10] is never set,
+                   and code coverage report seems to confirm.
+                   Appease PhpStan for now;
+                   probably delete this block later.
+                */
+                if (isset($matches[self::$matchIndex8])) {
                     if ($cell === null) {
                         // We can't access the range, so return a REF error
                         $cellValue = ExcelError::REF();
                     } else {
-                        $cellRef = $matches[6] . $matches[7] . ':' . $matches[9] . $matches[10];
+                        $cellRef = $matches[6] . $matches[7] . ':' . $matches[self::$matchIndex9] . $matches[self::$matchIndex10];
                         if ($matches[2] > '') {
                             $matches[2] = trim($matches[2], "\"'");
                             if ((str_contains($matches[2], '[')) || (str_contains($matches[2], ']'))) {
