@@ -28,6 +28,7 @@ DSTDEVP                  | \PhpOffice\PhpSpreadsheet\Calculation\Database\DStDev
 DSUM                     | \PhpOffice\PhpSpreadsheet\Calculation\Database\DSum::evaluate
 DVAR                     | \PhpOffice\PhpSpreadsheet\Calculation\Database\DVar::evaluate
 DVARP                    | \PhpOffice\PhpSpreadsheet\Calculation\Database\DVarP::evaluate
+QUERY                    | \PhpOffice\PhpSpreadsheet\Calculation\Google\Google::query
 
 ## CATEGORY_DATE_AND_TIME
 
@@ -240,8 +241,11 @@ Excel Function           | PhpSpreadsheet Function
 ADDRESS                  | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Address::cell
 AREAS                    | **Not yet Implemented**
 CHOOSE                   | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Selection::CHOOSE
+CHOOSECOLS               | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Selection::CHOOSECOLS
+CHOOSEROWS               | **Not yet Implemented**
 COLUMN                   | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\RowColumnInformation::COLUMN
 COLUMNS                  | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\RowColumnInformation::COLUMNS
+DUMMYFUNCTION            | \PhpOffice\PhpSpreadsheet\Calculation\Google\Google::dummyfunction
 FILTER                   | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Filter::filter
 FORMULATEXT              | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Formula::text
 GETPIVOTDATA             | **Not yet Implemented**
@@ -283,8 +287,6 @@ BASE                     | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Base::
 CEILING                  | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Ceiling::ceiling
 CEILING.MATH             | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Ceiling::math
 CEILING.PRECISE          | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Ceiling::precise
-CHOOSECOLS               | **Not yet Implemented**
-CHOOSEROWS               | **Not yet Implemented**
 COMBIN                   | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Combinations::withoutRepetition
 COMBINA                  | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Combinations::withRepetition
 COS                      | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Trig\Cosine::cos

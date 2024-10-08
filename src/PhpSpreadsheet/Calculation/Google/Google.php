@@ -116,7 +116,7 @@ class Google
                 $calculation->getDebugLog()->writeDebugLog('Evaluating SQLite3 Query: %s returned error #%d %s', $query, $db->lastErrorCode(), $db->lastErrorMsg());
                 $result = ExcelError::VALUE();
             }
-        } catch (Exception|TypeError $e) {
+        } catch (Exception | TypeError $e) {
             $calculation->getDebugLog()->writeDebugLog('Evaluating SQLite3 Query: %s threw exception %s', $query, $e->getMessage());
             $result = ExcelError::VALUE();
         }

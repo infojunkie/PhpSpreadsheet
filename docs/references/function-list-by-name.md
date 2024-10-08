@@ -79,8 +79,8 @@ CHISQ.INV.RT             | CATEGORY_STATISTICAL           | \PhpOffice\PhpSpread
 CHISQ.TEST               | CATEGORY_STATISTICAL           | \PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\ChiSquared::test
 CHITEST                  | CATEGORY_STATISTICAL           | \PhpOffice\PhpSpreadsheet\Calculation\Statistical\Distributions\ChiSquared::test
 CHOOSE                   | CATEGORY_LOOKUP_AND_REFERENCE  | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Selection::CHOOSE
-CHOOSECOLS               | CATEGORY_MATH_AND_TRIG         | **Not yet Implemented**
-CHOOSEROWS               | CATEGORY_MATH_AND_TRIG         | **Not yet Implemented**
+CHOOSECOLS               | CATEGORY_LOOKUP_AND_REFERENCE  | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\Selection::CHOOSECOLS
+CHOOSEROWS               | CATEGORY_LOOKUP_AND_REFERENCE  | **Not yet Implemented**
 CLEAN                    | CATEGORY_TEXT_AND_DATA         | \PhpOffice\PhpSpreadsheet\Calculation\TextData\Trim::nonPrintable
 CODE                     | CATEGORY_TEXT_AND_DATA         | \PhpOffice\PhpSpreadsheet\Calculation\TextData\CharacterConvert::code
 COLUMN                   | CATEGORY_LOOKUP_AND_REFERENCE  | \PhpOffice\PhpSpreadsheet\Calculation\LookupRef\RowColumnInformation::COLUMN
@@ -162,6 +162,7 @@ DROP                     | CATEGORY_MATH_AND_TRIG         | **Not yet Implemente
 DSTDEV                   | CATEGORY_DATABASE              | \PhpOffice\PhpSpreadsheet\Calculation\Database\DStDev::evaluate
 DSTDEVP                  | CATEGORY_DATABASE              | \PhpOffice\PhpSpreadsheet\Calculation\Database\DStDevP::evaluate
 DSUM                     | CATEGORY_DATABASE              | \PhpOffice\PhpSpreadsheet\Calculation\Database\DSum::evaluate
+DUMMYFUNCTION            | CATEGORY_LOOKUP_AND_REFERENCE  | \PhpOffice\PhpSpreadsheet\Calculation\Google\Google::dummyfunction
 DURATION                 | CATEGORY_FINANCIAL             | **Not yet Implemented**
 DVAR                     | CATEGORY_DATABASE              | \PhpOffice\PhpSpreadsheet\Calculation\Database\DVar::evaluate
 DVARP                    | CATEGORY_DATABASE              | \PhpOffice\PhpSpreadsheet\Calculation\Database\DVarP::evaluate
@@ -461,6 +462,7 @@ Excel Function           | Category                       | PhpSpreadsheet Funct
 QUARTILE                 | CATEGORY_STATISTICAL           | \PhpOffice\PhpSpreadsheet\Calculation\Statistical\Percentiles::QUARTILE
 QUARTILE.EXC             | CATEGORY_STATISTICAL           | **Not yet Implemented**
 QUARTILE.INC             | CATEGORY_STATISTICAL           | \PhpOffice\PhpSpreadsheet\Calculation\Statistical\Percentiles::QUARTILE
+QUERY                    | CATEGORY_DATABASE              | \PhpOffice\PhpSpreadsheet\Calculation\Google\Google::query
 QUOTIENT                 | CATEGORY_MATH_AND_TRIG         | \PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Operations::quotient
 
 ## R
