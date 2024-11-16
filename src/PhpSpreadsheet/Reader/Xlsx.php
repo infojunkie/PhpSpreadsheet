@@ -304,6 +304,11 @@ class Xlsx extends BaseReader
         return isset($c, $c->v) ? (string) $c->v : null;
     }
 
+    public static function replacePrefixes(string $formula): string
+    {
+        return str_replace(['_xlfn.', '_xlws.'], '', $formula);
+    }
+
     private function castToFormula(?SimpleXMLElement $c, string $r, string &$cellDataType, mixed &$value, mixed &$calculatedValue, string $castBaseType, bool $updateSharedCells = true): void
     {
         if ($c === null) {
@@ -311,8 +316,7 @@ class Xlsx extends BaseReader
         }
         $attr = $c->f->attributes();
         $cellDataType = DataType::TYPE_FORMULA;
-        $formula = (string) $c->f;
-        $formula = str_replace(['_xlfn.', '_xlws.'], '', $formula);
+        $formula = self::replacePrefixes((string) $c->f);
         $value = "=$formula";
         $calculatedValue = self::$castBaseType($c);
 
@@ -395,6 +399,7 @@ class Xlsx extends BaseReader
 
         // Initialisations
         $excel = new Spreadsheet();
+        $excel->setValueBinder($this->valueBinder);
         $excel->removeSheetByIndex(0);
         $addingFirstCellStyleXf = true;
         $addingFirstCellXf = true;
@@ -914,6 +919,7 @@ class Xlsx extends BaseReader
                                                     $value = self::castToString($c);
                                                     if (is_numeric($value)) {
                                                         $value += 0;
+                                                        $cellDataType = DataType::TYPE_NUMERIC;
                                                     }
                                                 } else {
                                                     // Formula

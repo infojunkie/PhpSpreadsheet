@@ -112,8 +112,11 @@ class Cell implements Stringable
                 $dataType = DataType::TYPE_STRING;
             }
             $this->dataType = $dataType;
-        } elseif (self::getValueBinder()->bindValue($this, $value) === false) {
-            throw new SpreadsheetException('Value could not be bound to cell.');
+        } else {
+            $valueBinder = $worksheet->getParent()?->getValueBinder() ?? self::getValueBinder();
+            if ($valueBinder->bindValue($this, $value) === false) {
+                throw new SpreadsheetException('Value could not be bound to cell.');
+            }
         }
         $this->ignoredErrors = new IgnoredErrors();
     }
@@ -232,7 +235,8 @@ class Cell implements Stringable
      */
     public function setValue(mixed $value, ?IValueBinder $binder = null): self
     {
-        $binder ??= self::getValueBinder();
+        // Cells?->Worksheet?->Spreadsheet
+        $binder ??= $this->parent?->getParent()?->getParent()?->getValueBinder() ?? self::getValueBinder();
         if (!$binder->bindValue($this, $value)) {
             throw new SpreadsheetException('Value could not be bound to cell.');
         }
@@ -320,7 +324,7 @@ class Cell implements Stringable
         self::updateIfCellIsTableHeader($this->getParent()?->getParent(), $this, $oldValue, $value);
         $worksheet = $this->getWorksheet();
         $spreadsheet = $worksheet->getParent();
-        if (isset($spreadsheet)) {
+        if (isset($spreadsheet) && $spreadsheet->getIndex($worksheet, true) >= 0) {
             $originalSelected = $worksheet->getSelectedCells();
             $activeSheetIndex = $spreadsheet->getActiveSheetIndex();
             $style = $this->getStyle();
